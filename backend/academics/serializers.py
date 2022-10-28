@@ -75,7 +75,7 @@ class QuestionSerializers(serializers.Serializer):
         fields=('question_name','answer','option_a','option_b','option_c','option_d','test_associated')
 
 
-
+  
     def create(self,validated_data):
         question_detail=Question.objects.create(
                 question_name=validated_data['question_name'],
@@ -120,6 +120,7 @@ class StudentCourseSerializer(serializers.Serializer):
                 course_id=Course.objects.get(access_course_id=validated_data['course_name'])
             )
         studentcourse_detail.save()
+        
         return studentcourse_detail
     
     def update(self,instance,validated_data):
