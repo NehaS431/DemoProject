@@ -84,7 +84,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class GetUserListSerializer(serializers.ModelSerializer):
     class Meta:
-        odel=User
+        model=User
         fields = ('username', 'first_name', 'last_name', 'email')
         extra_kwargs = {
             'first_name': {'required': False},

@@ -50,7 +50,7 @@ class LoginView(APIView):
             return Response({"Invalid" : "Invalid username or password!!"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class RegisterUserAPIView(APIView):
+class RegisterUserAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
