@@ -1,3 +1,4 @@
+from functools import partial
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from rest_framework.response import Response
@@ -6,8 +7,10 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import AccessToken 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import CourseSerializers , TestSerializers ,QuestionSerializers ,StudentCourseSerializer
-from .models import Course ,Test ,Question , StudentCourse
+from .serializers import (CourseSerializers , TestSerializers ,
+QuestionSerializers ,StudentCourseSerializer ,TestAppearedSerializer , 
+SelectedAnswersSerializer)
+from .models import Course ,Test ,Question , StudentCourse ,TestAppeared , SelectedAnswers
 # Create your views here.
 
 def CheckStaff(self,request):
@@ -176,7 +179,6 @@ class QuestionAssociate(APIView):
 
 
 class StudentCourseAssociate(APIView):
-    #this is under work and not yet completed
     def GetCourseID(self,pk):
         try:
             return StudentCourse.objects.get(pk=pk)
@@ -194,23 +196,66 @@ class StudentCourseAssociate(APIView):
     def get(self,request):
         # pass
         #get username through getuser function and 
-        #return only those associcated entries
+        #return course details related to user
         user=GetUser(self,request)
-        print(user,"USER IS HERE")
+        # print(user,"USER IS HERE")
         #get the user name id 
         user_Data=User.objects.get(username=user)
-        print("User data: ",user_Data.id)
+        # print("User data: ",user_Data.id)
         user_list=StudentCourse.objects.filter(student_id=user_Data.id)
         serializer_data=StudentCourseSerializer(user_list, many=True).data
         return Response(serializer_data)
 
     def delete(self,request,pk):
         #pk here refers to the course id
-        user=GetUser(self,request)
-        user_id=User.objects.get(username=user).id
-        course_id=self.GetCourseID(self,request).id
-        required_user=StudentCourse.object.get(student_id=user_id,course_id=course_id)
+        required_user=StudentCourse.objects.get(pk=pk)
         required_user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
        
         
+class TestAppearedAssociate(APIView):
+
+    def GetTestAppeared(self,pk):
+        try:
+            return TestAppeared.objects.get(pk=pk)
+        except TestAppeared.DoesNotExist:
+            raise Http404
+
+    def get(self, request, format=None):
+        test_appeared = TestAppeared.objects.all()
+        serializer_class = TestAppearedSerializer(test_appeared, many=True)
+        return Response(serializer_class.data)
+
+    def post(self,request):
+        data=request.data
+        serializer_class = TestAppearedSerializer(data=data)
+        if serializer_class.is_valid():
+            serializer_class.save()
+            return Response(serializer_class.data, status=201)
+        return Response(serializer_class.errors, status=400)
+    #the put method will be called when we submit the test
+    def   put(self,request,pk):
+        test_appeared=self.GetTestAppeared(pk)
+        serializer = TestAppearedSerializer(test_appeared, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    
+class SelectedAnswersAssociate(APIView):
+    def get(self, request, format=None):
+        selected_answer_details = SelectedAnswers.objects.all()
+        serializer_class = SelectedAnswersSerializer(selected_answer_details, many=True)
+        return Response(serializer_class.data)
+
+    def post(self,request):
+        data=request.data
+        serializer_class = SelectedAnswersSerializer(data=data)
+        if serializer_class.is_valid():
+            serializer_class.save()
+            return Response(serializer_class.data, status=201)
+        return Response(serializer_class.errors, status=400)
+
+

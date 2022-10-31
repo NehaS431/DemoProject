@@ -39,3 +39,25 @@ class StudentCourse(models.Model):
 
     def __str__(self):
         return str(self.student_id)
+
+
+class TestAppeared(models.Model):
+    student = models.ForeignKey(User,on_delete = models.CASCADE)
+    test = models.ForeignKey(Test, on_delete = models.CASCADE)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    score = models.IntegerField(default = 0)
+
+    def __str__(self):
+        return (str(self.test))
+
+
+class SelectedAnswers(models.Model):
+    student = models.ForeignKey(User, on_delete = models.CASCADE)
+    test = models.ForeignKey(Test, on_delete = models.CASCADE)
+    question = models.ForeignKey(Question, on_delete = models.CASCADE)
+    selected_answer = models.TextField(max_length=600)
+
+    def __str__(self):
+        return (str(self.question))
+    

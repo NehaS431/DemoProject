@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import AccessToken 
 
-
-from .models import Course , Test , Question
+from .models import Course , Test , Question , StudentCourse, TestAppeared ,SelectedAnswers
 
 class CourseSerializers(serializers.Serializer):
 
@@ -102,30 +102,81 @@ class QuestionSerializers(serializers.Serializer):
 
 
 class StudentCourseSerializer(serializers.Serializer):
-    #this is under work and not yet completed
     student_id=serializers.CharField(required=True,max_length=256)
     course_id=serializers.CharField(required=True,max_length=256)
     
     class Meta:
-        model=Question
+        model=StudentCourse
         fields=('student_id','course_id')
 
 
     def create(self,validated_data):
         #logic
-        studentcourse_detail=Question.objects.create(
-                # access_student_id=
-                # access_course_id=
-                student_id=User.objects.get(access_student_id=validated_data['student_id']),
-                course_id=Course.objects.get(access_course_id=validated_data['course_name'])
+        #student id will have student username (username is a unique name)
+        #course id will have the course name (coursename is a unique name)
+
+        studentcourse_detail=StudentCourse.objects.create(
+                student_id=User.objects.get(username=validated_data['student_id']),
+                course_id=Course.objects.get(course_name=validated_data['course_id'])
             )
+
         studentcourse_detail.save()
         
         return studentcourse_detail
     
+
+
+class TestAppearedSerializer(serializers.Serializer):
+    student=serializers.CharField(required=True,max_length=256)
+    test=serializers.CharField(required=True,max_length=256)
+    start_time=serializers.TimeField()
+    end_time=serializers.TimeField()
+    score=serializers.IntegerField(required=True)
+    class Meta:
+        model=TestAppeared
+        fields=('student','test','score')
+
+    def create(self,validated_data):
+        test_appeared_details=TestAppeared.objects.create(
+            student=User.objects.get(username=validated_data['student']),
+            test=Test.objects.get(test_name=validated_data['test']),
+            start_time=validated_data['start_time'],
+            end_time=validated_data['end_time'],
+            score=validated_data['score']
+        )
+        test_appeared_details.save()
+        return test_appeared_details
+
     def update(self,instance,validated_data):
-        #logic
-        instance.student_id=User.objects.get(username=validated_data['username']),
-        instance.course_id=Course.objects.get(course_name=validated_data['course_name'])
+        instance.score=validated_data.get('score',instance.score)
+        instance.end_time=validated_data.get('end_time',instance.end_time)
         instance.save()
         return instance
+
+class SelectedAnswersSerializer(serializers.Serializer):
+    student=serializers.CharField(required=True,max_length=256)
+    test=serializers.CharField(required=True,max_length=256)
+    question=serializers.CharField(required=True)
+    selected_answer = serializers.CharField(required=True,max_length=256)
+
+    class Meta:
+        model=SelectedAnswers
+        fields=('student','test','question','selected_answer')
+
+    def create(self,validated_data):
+        selected_answer_details=SelectedAnswers.objects.create(
+            student=User.objects.get(username=validated_data['student']),
+            test=Test.objects.get(test_name=validated_data['test']),
+            question=Question.objects.get(question_name=validated_data['question']),
+            selected_answer=validated_data['selected_answer']
+        )
+
+        selected_answer_details.save()
+        return selected_answer_details
+
+
+
+
+    
+
+

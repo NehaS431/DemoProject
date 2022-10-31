@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, Test , Question ,StudentCourse
+from .models import Course, Test , Question ,StudentCourse ,TestAppeared ,SelectedAnswers
 # Register your models here.
 
 
@@ -18,3 +18,13 @@ class QuestionAdmin(admin.ModelAdmin):
 @admin.register(StudentCourse)
 class StudentCourseAdmin(admin.ModelAdmin):
     list_display=['id','student_id','course_id']
+
+
+@admin.register(TestAppeared)
+class TestAppearedAdmin(admin.ModelAdmin):
+    list_display=['id','student','test','start_time','end_time','score']
+
+
+@admin.register(SelectedAnswers)
+class SelectedAnswersAdmin(admin.ModelAdmin):
+    list_display = ['id', 'student', 'test', 'question', 'selected_answer']

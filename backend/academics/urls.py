@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-from .views import CourseAssociate , TestAssociate ,QuestionAssociate,StudentCourseAssociate
+from .views import (CourseAssociate , TestAssociate ,TestAppearedAssociate,
+QuestionAssociate,StudentCourseAssociate , SelectedAnswersAssociate)
 
 
 urlpatterns=[
@@ -19,4 +20,9 @@ urlpatterns=[
     path('createstudentassociatedcourse/',StudentCourseAssociate.as_view(),name='StudentCourseAssociate'),
     path('viewstudentassociatedcourse/',StudentCourseAssociate.as_view(),name='StudentCourseAssociate'),
     path('deletestudentassociatedcourse/<int:pk>/',StudentCourseAssociate.as_view(),name='StudentCourseAssociate'),
+    path('create-testappeared/',TestAppearedAssociate.as_view(),name='TestAppearedAssociate'),
+    path('view-testappeared/',TestAppearedAssociate.as_view(),name='TestAppearedAssociate'),
+    path('submit-testappeared/<int:pk>/',TestAppearedAssociate.as_view(),name='TestAppearedAssociate'),
+    path('create-selectedans/',SelectedAnswersAssociate.as_view(),name='SelectedAnswersAssociate'),
+    path('views-selectedans/',SelectedAnswersAssociate.as_view(),name='SelectedAnswersAssociate'),
 ]
